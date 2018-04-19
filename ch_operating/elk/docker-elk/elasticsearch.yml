@@ -1,0 +1,22 @@
+version: '3.3'
+
+configs:
+  elasticsearch_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+
+services:
+
+  elasticsearch:
+    build:
+      context: elasticsearch/
+    image: chanwit/elasticsearch:6.1
+    configs:
+      - source: elasticsearch_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+networks:
+  default:
+    external:
+      name: elk_net

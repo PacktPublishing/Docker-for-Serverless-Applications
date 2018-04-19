@@ -1,0 +1,34 @@
+version: '3.3'
+
+configs:
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline_config:
+    file: ./logstash/pipeline/logstash.conf
+
+services:
+
+  logstash:
+    build:
+      context: logstash/
+    image: chanwit/logstash:6.1
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline_config
+        target: /usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - published: 5000
+        target: 5000
+        mode: host
+      - published: 5000
+        target: 5000
+        protocol: udp
+        mode: host
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+networks:
+  default:
+    external:
+      name: elk_net

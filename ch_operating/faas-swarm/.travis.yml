@@ -1,0 +1,21 @@
+sudo: required
+
+services:
+      - docker
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+before_install:
+    - ./contrib/ci.sh
+    
+script:
+    - make
+
+after_success:
+    - if [ ! -s "$TRAVIS_TAG" ] ; then 
+        docker tag $DOCKER_NS/faas-swarm:latest-dev $DOCKER_NS/faas-swarm:$TRAVIS_TAG;
+        docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD;
+        docker push $DOCKER_NS/faas-swarm:$TRAVIS_TAG;
+        fi

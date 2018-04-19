@@ -1,0 +1,10 @@
+# version: '3.3'
+#
+# networks:
+#   elk:
+#     driver: suranet:latest
+#     attachable: true
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet:  10.32.200.0/24

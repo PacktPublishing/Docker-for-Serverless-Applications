@@ -1,0 +1,24 @@
+version: '3.3'
+
+configs:
+  kibana_config:
+    file: ./kibana/config/kibana.yml
+
+services:
+
+  kibana:
+    build:
+      context: kibana/
+    image: chanwit/kibana:6.1
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
+    ports:
+      - published: 5601
+        target: 5601
+        mode: host
+
+networks:
+  default:
+    external:
+      name: elk_net
