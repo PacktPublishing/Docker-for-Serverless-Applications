@@ -1,0 +1,4 @@
+FROM tomcat:8.0
+
+HEALTHCHECK --interval=2m --timeout=5s \
+  CMD curl -f http://localhost:8080/ || exit 1

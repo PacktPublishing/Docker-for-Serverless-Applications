@@ -1,0 +1,9 @@
+#!/usr/bin/env gorun
+package main
+
+import . "github.com/chanwit/lib"
+
+func main() {
+	docker := NewClient()
+	Jq(".ServerVersion", docker.Info())
+}

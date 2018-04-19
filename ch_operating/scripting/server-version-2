@@ -1,0 +1,32 @@
+#!/usr/bin/env gorun
+
+package main
+
+import (
+	"fmt"
+	"context"
+
+	"github.com/hokaccha/go-prettyjson"
+	"github.com/docker/docker/client"
+)
+
+func main() {
+	ctx := context.Background()
+
+	cli, err := client.NewClient(client.DefaultDockerHost, "1.35", nil, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	info, err := cli.Info(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	s, err := prettyjson.Marshal(info)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(s))
+}

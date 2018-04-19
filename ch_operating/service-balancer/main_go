@@ -1,0 +1,122 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"gopkg.in/robfig/cron.v2"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
+)
+
+// use with socat
+//
+//
+// open docker client
+// read crontab from the config
+// read line
+// add crontab
+// execute command to invoke docker
+
+var cli *client.Client
+
+func configByName(name string) (string, error) {
+	configs, err := cli.ConfigList(context.Background(), types.ConfigListOptions{
+		Filters: filters.NewArgs(filters.Arg("name", name)),
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if len(configs) == 0 {
+		return "", fmt.Errorf("not found")
+	}
+
+	return string(configs[0].Spec.Data), nil
+}
+
+func configById(id string) (string, error) {
+	configs, err := cli.ConfigList(context.Background(), types.ConfigListOptions{
+		Filters: filters.NewArgs(filters.Arg("id", id)),
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if len(configs) == 0 {
+		return "", fmt.Errorf("not found")
+	}
+
+	return string(configs[0].Spec.Data), nil
+}
+
+func createCrontab(data string) *cron.Cron {
+	fmt.Println("got data ...")
+	c := cron.New()
+	lines := strings.Split(data, "\n")
+	fmt.Printf("%v\n", lines)
+	for _, line := range lines {
+		parts := strings.SplitN(line, "'", 3)
+		if len(parts) == 3 {
+			spec := strings.TrimSpace(parts[0])
+			command := strings.TrimSpace(parts[1])
+			fmt.Printf("adding %s for %s\n", spec, command)
+			c.AddFunc(spec, func(){
+				fmt.Println(command)
+			})
+		}
+	}
+	return c
+}
+
+func main() {
+	var err error
+	cli, err = client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	data, err := configByName("crontab")
+
+	if err != nil {
+		if err.Error() != "not found" {
+			panic(err)
+		}
+	} else {
+		fmt.Print(data)
+	}
+
+	msgCh, _ := cli.Events(context.Background(), types.EventsOptions{
+		Filters: filters.NewArgs(filters.Arg("config", "crontab")),
+	})
+
+	var c *cron.Cron
+	for {
+		msg := <- msgCh
+		if msg.Action == "create" || msg.Action == "update" {
+			fmt.Println("action kicked in")
+
+			data, err := configById(msg.Actor.ID)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("config by id -> data")
+			if c != nil {
+				c.Stop()
+			}
+			c = createCrontab(data)
+			c.Start()
+		} else if msg.Action == "remove" {
+			fmt.Println("removing ...")
+			if c != nil {
+				c.Stop()
+			}
+			c = nil
+		}
+	}
+
+}
