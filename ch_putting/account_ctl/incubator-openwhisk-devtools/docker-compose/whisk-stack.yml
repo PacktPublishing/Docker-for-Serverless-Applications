@@ -1,0 +1,136 @@
+version: '3.3'
+services:
+  db:
+    image: couchdb:1.6
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: whisk_admin
+      COUCHDB_PASSWORD: some_passw0rd
+    volumes:
+      - ~/tmp/openwhisk/couchdb:/usr/local/var/lib/couchdb:rw
+
+  # KAFKA SERVICES
+  zookeeper:
+    image: zookeeper:3.4
+    environment:
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888
+      ZOO_MY_ID: 1
+
+  kafka:
+    image: wurstmeister/kafka:0.11.0.1
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/tmp/openwhisk/kafka:/kafka:rw
+
+  # WHISK CONTROLLER
+  controller:
+    image: openwhisk/controller@sha256:61b0096211bd1f4dbfcd7b53d6fef919fe57ac0a3833ac4b54162336441b92ea
+    command: /bin/sh -c "exec /init.sh 0 >> /logs/controller-local_logs.log 2>&1"
+    env_file:
+      - ./docker-whisk-controller.env   # env vars shared
+      - ~/tmp/openwhisk/local.env       # generated during make setup
+    environment:
+      COMPONENT_NAME: controller
+      PORT: 8888
+
+      KAFKA_HOSTS: kafka:9092
+      ZOOKEEPER_HOSTS: zookeeper:2181
+
+      DB_PROVIDER: CouchDB
+      DB_PROTOCOL: http
+      DB_PORT: 5984
+      DB_HOST: db
+      DB_USERNAME: whisk_admin
+      DB_PASSWORD: some_passw0rd
+      CONFIG_akka_remote_netty_tcp_hostname: controller
+      CONFIG_akka_remote_netty_tcp_port: 2551
+      CONFIG_akka_remote_netty_tcp_bindPort: 2551
+
+      LOADBALANCER_HOST: ${DOCKER_COMPOSE_HOST}
+      LOADBALANCER_HOST_PORT: 443
+    volumes:
+      - ~/tmp/openwhisk/controller/logs:/logs
+
+  # WHISK INVOKER AGENT
+  invoker:
+    image: openwhisk/invoker@sha256:3a7dcee078905b47306f3f06c78eee53372a4a9bf47cdd8eafe0194745a9b8d6
+    command: /bin/sh -c "exec /init.sh 0 >> /logs/invoker-local_logs.log 2>&1"
+    privileged: true
+    pid: "host"
+    userns_mode: "host"
+    env_file:
+      - ./docker-whisk-controller.env # env vars shared
+      - ~/tmp/openwhisk/local.env     # generated during make setup
+    environment:
+      COMPONENT_NAME: invoker
+      SERVICE_NAME: invoker0
+      PORT: 8085
+
+      KAFKA_HOSTS: kafka:9092
+      ZOOKEEPER_HOSTS: zookeeper:2181
+
+      DB_PROVIDER: CouchDB
+      DB_PROTOCOL: http
+      DB_PORT: 5984
+      DB_HOST: db
+      DB_USERNAME: whisk_admin
+      DB_PASSWORD: some_passw0rd
+
+      EDGE_HOST: ${DOCKER_COMPOSE_HOST}
+      EDGE_HOST_APIPORT: 443
+
+      CONFIG_whisk_containerFactory_containerArgs_network: openwhisk_default
+
+      WHISK_API_HOST_NAME: ${DOCKER_COMPOSE_HOST}
+    volumes:
+      - ~/tmp/openwhisk/invoker/logs:/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/containers
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    # ports:
+    #  - "8085:8085"
+
+  # The API Gateway is currently used to expose the Controller API
+  #   see apigateway/conf/whisk-docker-compose.conf
+  redis:
+    image: redis:2.8
+    expose:
+      - "6379"
+
+  apigateway:
+    image: adobeapiplatform/apigateway:1.1.0
+    volumes:
+      - ~/tmp/openwhisk/apigateway/ssl:/etc/ssl:ro
+      - ~/tmp/openwhisk/apigateway/conf:/etc/api-gateway/generated-conf.d:ro
+      - ~/tmp/openwhisk/apigateway/env.conf:/etc/api-gateway/environment.conf.d:ro
+    ports:
+      - published: 443
+        target: 443
+        mode: host
+
+  kafka-rest:
+    image: confluentinc/cp-kafka-rest:3.3.1
+    hostname: kafka-rest
+    environment:
+      - ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT="*"
+      - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_REST_HOST_NAME=kafka-rest
+      - KAFKA_REST_LISTENERS=http://kafka-rest:8082
+      - KAFKA_REST_CONSUMER_REQUEST_TIMEOUT_MS=30000
+      - KAFKA_REST_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+
+  kafka-topics-ui:
+      image: landoop/kafka-topics-ui:0.9.3
+      environment:
+        - KAFKA_REST_PROXY_URL=http://kafka-rest:8082
+        - KAFKA_REST_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+        - PROXY=true
+
+networks:
+  default:
+    external:
+      name: whisk_net
