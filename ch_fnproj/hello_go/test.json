@@ -1,0 +1,23 @@
+{
+    "tests": [
+        {
+            "input": {
+                "body": {
+                    "name": "Johnny"
+                }
+            },
+            "output": {
+                "body": {
+                    "success": "Hello Johnny"
+                }
+            }
+        },
+        {
+            "input": {
+                "body": ""
+            },
+            "output": { },
+            "err": "err JSON Decode: EOF"
+        }
+    ]
+}
