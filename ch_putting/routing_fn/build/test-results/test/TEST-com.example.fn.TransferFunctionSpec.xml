@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.fn.TransferFunctionSpec" tests="1" skipped="0" failures="1" errors="0" timestamp="2018-03-01T16:17:45" hostname="chanwit-3558" time="0.495">
+  <properties/>
+  <testcase name="should call whisk's accountctl" classname="com.example.fn.TransferFunctionSpec" time="0.495">
+    <failure message="java.lang.Exception: OpenWhisk Action API: Not Found" type="java.lang.Exception">java.lang.Exception: OpenWhisk Action API: Not Found
+	at com.example.fn.TransferFunction.whiskAdjust(TransferFunction.java:164)
+	at com.example.fn.TransferFunctionSpec.should call whisk's accountctl(TransferFunctionSpec.groovy:47)
+</failure>
+  </testcase>
+  <system-out><![CDATA[--> POST https://127.0.0.1/api/v1/namespaces/guest/actions/accounting_ctl?blocking=true&result=false&timeout=60000 HTTP/1.1
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+Authorization: Basic MjNiYzQ2YjEtNzFmNi00ZWQ1LThjNTQtODE2YWE0ZjhjNTAyOjEyM3pPM3haQ0xyTU42djJCS0sxZFhZRnBYbFBrY2NPRnFtMTJDZEFzTWdSVTRWck5aOWx5R1ZDR3VNREdJd1A=
+Accept: application/json
+User-Agent: Swagger-Codegen/1.0.0/java
+
+{"accountId":"AB123","amount":-10.0}
+--> END POST (36-byte body)
+<-- HTTP/1.1 404 Not Found (166ms)
+Date: Thu, 01 Mar 2018 16:17:45 GMT
+Content-Type: application/json
+Content-Length: 60
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Authorization, Content-Type
+Server: openwhisk/api-gateway-1.9.3.1
+OkHttp-Sent-Millis: 1519921065717
+OkHttp-Received-Millis: 1519921065757
+
+{"error":"The requested resource does not exist.","code":27}
+<-- END HTTP (60-byte body)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

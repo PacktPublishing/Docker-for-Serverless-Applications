@@ -1,0 +1,25 @@
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'java'
+    id 'application'
+}
+
+mainClassName = "event.machine.main.Main"
+
+run {
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'org.web3j:core:3.2.0'
+
+    testCompile 'junit:junit:4.12'
+}

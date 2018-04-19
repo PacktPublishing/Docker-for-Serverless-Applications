@@ -1,0 +1,16 @@
+{
+  "name": "hivectl",
+  "version": "1.0.0",
+  "description": "HiveMind control function",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Chanwit Kaewkasi",
+  "license": "GPL",
+  "dependencies": {
+    "chromeless": "^1.5.0",
+    "get-stdin": "^5.0.1"
+  }
+}

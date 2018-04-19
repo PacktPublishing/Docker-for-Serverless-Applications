@@ -1,0 +1,22 @@
+|--> POST https://127.0.0.1/api/v1/namespaces/guest/actions/accounting_ctl?blocking=true&result=false&timeout=60000 HTTP/1.1
+.Content-Type: application/json; charset=utf-8
+Content-Length: 36
+žAuthorization: Basic MjNiYzQ2YjEtNzFmNi00ZWQ1LThjNTQtODE2YWE0ZjhjNTAyOjEyM3pPM3haQ0xyTU42djJCS0sxZFhZRnBYbFBrY2NPRnFtMTJDZEFzTWdSVTRWck5aOWx5R1ZDR3VNREdJd1A=
+Accept: application/json
+'User-Agent: Swagger-Codegen/1.0.0/java
+
+%{"accountId":"AB123","amount":-10.0}
+--> END POST (36-byte body)
+#<-- HTTP/1.1 404 Not Found (166ms)
+$Date: Thu, 01 Mar 2018 16:17:45 GMT
+Content-Type: application/json
+Content-Length: 60
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+:Access-Control-Allow-Headers: Authorization, Content-Type
+&Server: openwhisk/api-gateway-1.9.3.1
+"OkHttp-Sent-Millis: 1519921065717
+&OkHttp-Received-Millis: 1519921065757
+
+={"error":"The requested resource does not exist.","code":27}
+<-- END HTTP (60-byte body)

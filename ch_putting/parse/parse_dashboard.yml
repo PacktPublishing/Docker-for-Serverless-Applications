@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+
+  parse_dashboard:
+    image: parseplatform/parse-dashboard:1.1.2
+    environment:
+      - PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=true
+    deploy:
+      labels:
+        - "traefik.docker.network=parse_net"
+        - "traefik.port=4040"
+        - "traefik.frontend.rule=Method: GET,POST,PUT,DELETE,OPTIONS,HEAD,CONNECT"
+        - "traefik.frontend.entryPoints=parse_dashboard"
+        - "traefik.frontend.headers.customresponseheaders.Access-Control-Allow-Origin=*"
+    configs:
+      - source: config.json
+        target: /src/Parse-Dashboard/parse-dashboard-config.json
+
+configs:
+  config.json:
+    file: ./config.json
+
+networks:
+  default:
+    external:
+      name: parse_net

@@ -1,0 +1,46 @@
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'java'
+    id 'groovy'
+    id 'application'
+}
+
+mainClassName = 'App'
+
+dependencies {
+    // FN Project
+    compile 'com.fnproject.fn:api:1.0.56'
+
+    // json encoding
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.4'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.4'
+
+    // REST client
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
+    compile 'io.swagger:swagger-annotations:1.5.15'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
+    compile 'com.squareup.okhttp:logging-interceptor:2.7.5'
+    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'joda-time:joda-time:2.9.9'
+
+    // Simplify Java syntax
+    compile group: 'org.projectlombok', name: 'lombok-maven',
+            version: '1.16.20.0', ext: 'pom'
+
+    // Ethereum Client
+    compile 'org.web3j:core:3.2.0'
+
+    // Testing
+    testCompile 'com.fnproject.fn:testing:1.0.56'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://dl.bintray.com/fnproject/fnproject"
+    }
+}

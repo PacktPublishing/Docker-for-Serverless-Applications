@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "serverURL": "http://localhost:1337/parse",
+      "appId": "APP1",
+      "masterKey": "MASTER_KEY",
+      "appName": "APP1",
+      "iconName": "MyAppIcon.png",
+      "supportedPushLocales": ["en", "ru", "fr"]
+    }
+  ],
+  "users": [
+    {
+      "user":"admin",
+      "pass":"password"
+    }
+  ],
+  "iconsFolder": "icons",
+  "allowInsecureHTTP": true
+}

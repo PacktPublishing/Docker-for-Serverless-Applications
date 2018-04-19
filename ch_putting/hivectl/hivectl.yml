@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  hivectl:
+    lang: node
+    handler: ./hivectl
+    image: chanwit/hivectl:0.4

@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+
+  parse_server:
+    image: parseplatform/parse-server:2.6.5
+    command: --appId APP1 --masterKey MASTER_KEY --databaseURI mongodb://mongo/test
+    deploy:
+      labels:
+        - "traefik.docker.network=parse_net"
+        - "traefik.port=1337"
+        - "traefik.frontend.rule=Method: GET,POST,PUT,DELETE,OPTIONS,HEAD,CONNECT"
+        - "traefik.frontend.entryPoints=parse_server"
+        - "traefik.frontend.headers.customresponseheaders.Access-Control-Allow-Origin=*"
+
+networks:
+  default:
+    external:
+      name: parse_net

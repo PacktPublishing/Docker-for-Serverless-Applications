@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "typechain": "^0.1.2",
+    "typescript": "^2.7.2"
+  },
+  "dependencies": {
+    "web3": "0.20.5"
+  }
+}

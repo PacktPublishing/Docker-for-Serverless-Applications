@@ -1,0 +1,7 @@
+name: hello
+version: 0.0.4
+runtime: java
+cmd: com.example.fn.HelloFunction::handleRequest
+build_image: fnproject/fn-java-fdk-build:jdk9-1.0.56
+run_image: fnproject/fn-java-fdk:jdk9-1.0.56
+format: http

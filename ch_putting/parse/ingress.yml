@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+
+  docker-proxy:
+    image: rancher/socat-docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 8M
+        reservations:
+          cpus: '0.10'
+          memory: 8M
+
+  l7:
+    image: traefik:1.5.2
+    command: --docker
+      --docker.swarmmode
+      --docker.watch
+      --docker.endpoint=tcp://docker-proxy:2375
+      --entryPoints="Name:parse_server Address::1337"
+      --entryPoints="Name:parse_dashboard Address::4040"
+      --web --logLevel=DEBUG
+    ports:
+      - published: 1337
+        target: 1337
+        protocol: tcp
+        mode: host
+      - published: 4040
+        target: 4040
+        protocol: tcp
+        mode: host
+
+networks:
+  default:
+    external:
+      name: parse_net

@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  hello:
+    lang: go
+    handler: ./hello
+    image: chanwit/hello:v1
