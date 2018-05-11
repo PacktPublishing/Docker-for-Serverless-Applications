@@ -1,0 +1,36 @@
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# exclude jar for gradle wrapper
+!gradle/wrapper/*.jar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# build files
+**/target
+target
+.gradle
+build
+
+.asscache
+.swagger-codegen-ignore
+.swagger-codegen/
+.travis.yml
+build.sbt
+docs/
+git_push.sh
+gradlew
+gradlew.bat
+pom.xml
+prodDb.*
+run-prod.sh
+swagger-codegen
+src/main/AndroidManifest.xml

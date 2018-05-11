@@ -1,0 +1,15 @@
+---
+# Remove controller containers.
+
+- name: remove controller
+  docker_container:
+    name: "controller{{ groups['controllers'].index(inventory_hostname) }}"
+    image: "{{ docker_registry }}{{ docker.image.prefix }}/controller:{{ docker.image.tag }}"
+    state: absent
+  ignore_errors: True
+
+- name: remove controller log directory
+  file:
+    path: "{{ whisk_logs_dir }}/controller{{ groups['controllers'].index(inventory_hostname) }}"
+    state: absent
+  become: "{{ logs.dir.become }}"

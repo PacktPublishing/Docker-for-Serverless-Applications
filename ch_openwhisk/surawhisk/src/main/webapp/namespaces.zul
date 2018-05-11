@@ -1,0 +1,23 @@
+<?script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"?>
+<?link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"?>
+<?link rel="stylesheet" href="/assets/custom.css?"?>
+
+<zk:zk xmlns="native" xmlns:w="client" xmlns:zk="zk" xmlns:x="xhtml" xmlns:z="zul">
+    <x:div class="col-md-10" apply="surawhisk.NamespacesComposer">
+        <div class="row">
+            <h2>Namespaces</h2>
+        </div>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <th>#</th>
+                    <th>Name</th>
+                </thead>
+                <x:tbody/>
+            </table>
+        </div>
+        <div class="row">
+            <button class="btn btn-default">Create</button>
+        </div>
+    </x:div>
+</zk:zk>

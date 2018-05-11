@@ -1,0 +1,10 @@
+---
+# This playbook deploys an Openwhisk Kafka bus.  
+
+- hosts: zookeepers
+  roles:
+  - zookeeper
+
+- hosts: kafkas
+  roles:
+  - kafka

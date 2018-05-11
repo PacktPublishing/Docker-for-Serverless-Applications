@@ -1,0 +1,10 @@
+<?script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"?>
+<?link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"?>
+<?link rel="stylesheet" href="/assets/custom.css?"?>
+
+<zk:zk xmlns="native" xmlns:w="client" xmlns:zk="zk" xmlns:x="xhtml" xmlns:z="zul">
+    <x:div class="col-md-12" apply="surawhisk.TraceComposer">
+    	<z:iframe id="iframe" width="100%" height="45em">
+    	</z:iframe>
+    </x:div>
+</zk:zk>

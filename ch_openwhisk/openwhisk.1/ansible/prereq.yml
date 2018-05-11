@@ -1,0 +1,8 @@
+---
+# This playbook prepares all target hosts for Openwhisk installation.
+# It will install all necessary packages to run Openwhisk playbooks.  
+
+- hosts: all:!ansible
+  serial: 1
+  roles:
+  - prereq

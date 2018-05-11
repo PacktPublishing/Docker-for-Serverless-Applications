@@ -1,0 +1,24 @@
+---
+# This role will install redis
+
+- name: "pull the redis:{{ redis.version }} image"
+  shell: "docker pull redis:{{ redis.version }}"
+  retries: "{{ docker.pull.retries }}"
+  delay: "{{ docker.pull.delay }}"
+
+- name: (re)start redis
+  docker_container:
+    name: redis
+    image: redis:{{ redis.version }}
+    state: started
+    recreate: true
+    restart_policy: "{{ docker.restart.policy }}"
+    ports:
+      - "{{ redis.port }}:6379"
+
+- name: wait until redis is up and running
+  action: shell (echo PING; sleep 1) | nc {{ ansible_host }} {{ redis.port }}
+  register: result
+  until: (result.rc == 0) and (result.stdout == '+PONG')
+  retries: 24
+  delay: 5

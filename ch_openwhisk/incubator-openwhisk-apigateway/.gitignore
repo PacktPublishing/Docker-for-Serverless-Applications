@@ -1,0 +1,20 @@
+target
+target/*
+conf.d/includes/resolvers.conf
+*.iml
+.DS_STORE
+lua_modules
+
+# Webstorm files
+.idea
+
+# No temporary vim files
+*~
+*.swp
+*.swo
+
+# Concourse
+secrets.yml
+
+# npm
+npm-debug.log

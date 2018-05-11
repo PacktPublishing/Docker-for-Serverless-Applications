@@ -1,0 +1,39 @@
+<?script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"?>
+<?link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"?>
+<?link rel="stylesheet" href="/assets/custom.css?"?>
+
+<zk:zk xmlns="native" xmlns:w="client" xmlns:zk="zk" xmlns:x="xhtml" xmlns:z="zul">
+
+    <x:div class="col-md-10" apply="surawhisk.SettingsComposer">
+
+        <div class="row no-buffer">
+            <h3>Settings</h3>
+        </div>
+
+        <div class="row top-buffer">
+            <div class="col-md-2">
+               <h5>Enpoint:</h5>
+            </div>
+            <div class="col-md-6">
+        	   <z:textbox id="endpoint" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="row top-buffer">
+            <div class="col-md-2">
+               <h5>API Key:</h5>
+            </div>
+            <div class="col-md-6">
+        	   <z:textbox id="api_key" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="row top-buffer">
+            <div class="col-md-2"/>
+            <div class="col-md-4">
+        	   <z:button id="btn_save" class="btn btn-default">Save</z:button>
+            </div>
+        </div>
+
+    </x:div>
+</zk:zk>

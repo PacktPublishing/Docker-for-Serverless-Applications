@@ -1,0 +1,39 @@
+---
+# This playbook prepares ansible configuration
+
+- hosts: localhost
+  tasks:
+  - name: find the ip of docker-machine
+    local_action: shell "docker-machine" "ip" "{{docker_machine_name | default('whisk')}}"
+    register: result
+    when: "'environments/docker-machine' in inventory_dir"
+
+  - name: get the docker-machine ip
+    set_fact:
+      docker_machine_ip: "{{ result.stdout }}"
+    when: "'environments/docker-machine' in inventory_dir"
+
+  - name: gen hosts for docker-machine 
+    local_action: template src="{{playbook_dir}}/environments/docker-machine/hosts.j2.ini" dest="{{ playbook_dir }}/environments/docker-machine/hosts"
+    when: "'environments/docker-machine' in inventory_dir"
+
+  # this step is needed to generate db_local.ini which is required by later steps
+  - name: add new db host on-the-fly
+    add_host: name={{ docker_machine_ip }} groups=db
+    when: "'environments/docker-machine' in inventory_dir"
+
+  - name: check if db_local.ini exists?
+    stat: path="{{ playbook_dir }}/db_local.ini"
+    register: db
+
+  - name: prepare db_local.ini
+    local_action: template src="db_local.ini.j2" dest="{{ playbook_dir }}/db_local.ini"
+    when: not db.stat.exists
+
+  - name: gen untrusted server certificate for host
+    local_action: shell "{{ playbook_dir }}/roles/nginx/files/genssl.sh" "*.{{ whisk_api_localhost_name | default(whisk_api_host_name) | default(whisk_api_localhost_name_default) }}" "server"
+    when: nginx.ssl.cert == "openwhisk-server-cert.pem"
+    
+  - name: gen untrusted client certificate for host
+    local_action: shell "{{ playbook_dir }}/roles/nginx/files/genssl.sh" "*.{{ whisk_api_localhost_name | default(whisk_api_host_name) | default(whisk_api_localhost_name_default) }}" "client"
+    when: nginx.ssl.client_ca_cert == "openwhisk-client-ca-cert.pem"

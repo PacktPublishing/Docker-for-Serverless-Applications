@@ -1,0 +1,18 @@
+sudo: required
+
+env:
+  global:
+    - DOCKER_COMPOSE_VERSION: 1.13.0
+  matrix:
+    - TOOL: docker-compose
+
+services:
+  - docker
+
+before_install:
+  - ./tools/travis/setupscan.sh
+  - ${TOOL}/.travis/setup.sh
+
+script:
+  - ./tools/travis/scancode.sh
+  - ${TOOL}/.travis/build.sh

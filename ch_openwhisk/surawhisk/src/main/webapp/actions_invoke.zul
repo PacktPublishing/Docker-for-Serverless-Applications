@@ -1,0 +1,53 @@
+<?script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"?>
+<?link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"?>
+<?link rel="stylesheet" href="/assets/custom.css?"?>
+
+<zk:zk xmlns="native" xmlns:w="client" xmlns:zk="zk" xmlns:x="xhtml" xmlns:z="zul">
+    <x:div class="col-md-10" apply="surawhisk.InvokeComposer">
+
+        <div class="row no-buffer">
+            <h3>Invoke Action</h3>
+        </div>
+
+        <div class="row top-buffer">
+            <div class="col-md-2">
+               <h5>Action:</h5>
+            </div>
+            <div class="col-md-9">
+        	   <z:listbox id="actions" mold="select" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="row top-buffer">
+            <div class="col-md-2">
+               <h5>Params:</h5>
+            </div>
+            <div class="col-md-3">
+                <z:button id="btn_add_param" class="btn btn-default">Add</z:button>
+            </div>
+        </div>
+        <x:div id="params">
+        </x:div>
+
+        <div class="row top-buffer"/>
+
+        <div class="row top-buffer">
+            <div class="col-md-2"/>
+            <div class="col-md-9">
+                <x:button id="btn_invoke" class="btn btn-default">Invoke</x:button>
+            </div>
+        </div>
+        <div class="row top-buffer">
+            <div class="col-md-2">
+               <h5>Result:</h5>
+            </div>
+            <div class="col-md-9">
+                <z:textbox id="result"
+                    readonly="true"
+                    multiline="true"
+                    class="form-control fixed-font"
+                    height="12em"/>
+            </div>
+        </div>
+    </x:div>
+</zk:zk>

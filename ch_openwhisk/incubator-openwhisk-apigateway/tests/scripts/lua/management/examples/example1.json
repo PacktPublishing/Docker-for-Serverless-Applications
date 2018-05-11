@@ -1,0 +1,69 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "Hello World API"
+  },
+  "basePath": "/native",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/hello": {
+      "get": {
+        "description": "Returns a greeting to the user!",
+        "responses": {
+          "200": {
+            "description": "Returns the greeting.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "Invalid characters in \"user\" were provided."
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "client_id": {
+      "type": "apiKey",
+      "name": "X-Api-Key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "client_id": []
+    }
+  ],
+  "x-gateway-rate-limit": [
+    {
+      "unit": "minute",
+      "units": 3,
+      "rate": 100
+    }
+  ],
+  "x-gateway-configuration": {
+    "cors": {
+      "enabled": true
+    },
+    "assembly": {
+      "execute": [
+        {
+          "invoke": {
+            "target-url": "https://appconnect.mybluemix.net",
+            "verb": "keep"
+          }
+        }
+      ]
+    }
+  }
+}
