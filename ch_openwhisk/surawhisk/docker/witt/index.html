@@ -1,0 +1,174 @@
+<head>
+	<!-- viewport for scaling by screen width-->
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<!-- jquery -->
+	<script type="text/javascript" src="/lib/jquery-3.1.1.min.js"></script>	
+	<!-- socket.io -->
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<!-- d3 v4 -->
+	<script type="text/javascript" src="/lib/d3.min.js"></script>
+	<!-- jsondiffpatch -->
+	<script type="text/javascript" src="/lib/jsondiffpatch-full.min.js"></script>
+	<script type="text/javascript" src="/lib/jsondiffpatch-formatters.min.js"></script>
+
+	<script type="text/javascript" src="/index.js"></script>
+
+	<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+	
+	<div id="content" style="display:none">
+
+	<div id="charts">
+		<div id="toolBar" style="height:20px; padding:5px 10px 5px 10px; color:white">
+			<div style="display: inline-block;" id="chartViewDiv">
+				<span class="roundRect toolBarButton" id="timelineView" style="background-color: LightSeaGreen; cursor: pointer;">Timeline View</span>
+				<span class="roundRect toolBarButton" id="listView" style="background-color: lightGrey; cursor: pointer; margin-left: 5px">List View</span>
+				<span class="roundRect toolBarButton" id="summaryView" style="background-color: lightGrey; cursor: pointer; margin-left: 5px">Summary View</span>
+			</div>
+			<div style="display: inline-block; margin-left: 30px">
+				<span class="roundRect toolBarButton" id="exportDataLocal" style="background-color: royalblue; cursor: pointer;">Export Selected Data</span>	
+				<!--<span class="roundRect toolBarButton" id="exportData" style="background-color: royalblue; cursor: pointer; margin-left: 10px">Share as a URL</span>	-->
+			</div>
+			
+		</div>
+		<svg id="overviewChart"></svg>
+		<br/><br/>
+		<div>
+			<div id="legend">
+				<div class="legendRect" style="background-color:orange"></div><div class="legendText">Trigger</div>
+				<div class="legendRect" style="background-color:LightSeaGreen"></div><div class="legendText">Rule</div>
+				<div class="legendRect" style="background-color:deepskyblue"></div><div class="legendText">Sequence</div>
+				<div class="legendRect" style="background-color:steelblue"></div><div class="legendText">Action</div>
+			</div>
+			<svg id="timelineChart">				
+			</svg>
+			<div id="listChart">
+				<div id="title" style="background-color: black; padding:5px; color:white;">
+					<div style="display: inline-block; width: 35%">Activation ID</div>
+					<div style="display: inline-block; width: 20%">Name</div>
+					<div style="display: inline-block; width: 10%">Type</div>
+					<div style="display: inline-block; width: 30%; text-align: right;">Time</div>
+				</div>				
+				<div id="listItems">
+				</div>
+			</div>
+			<div id="summaryChart" style="display: none; margin:10px 20px;">
+				Select an action to view its summary: 
+				<select id="summaryEntity" name="summaryEntity" style="font-size: 14px; margin-left: 10px;">						
+				</select>
+				<div id="summaryDiv" style="display: none">
+					<div style="margin:25px 0px;">
+						<div id="summaryActionTitle" style="font-size:24px; padding-bottom: 10px;"></div>
+						<span style='font-size: 14px; '>
+							<span id="summaryAtvNum"></span> between <span id="summaryStartTime"></span> to <span id="summaryEndTime"></span>
+						</span><br/>
+					</div>
+					<div>
+						<select id="successOrErrorSum" name="successOrErrorSum" style="font-size: 14px;">
+						</select>
+						<br/><br/>						
+					</div>
+					<div id="summaryDataDiv">
+						<div>
+							<b>Duration:</b><br/>
+							Average: <span id="avg"></span>ms, median: <span id="median"></span>ms, min: <span id="min"></span>ms, max: <span id="max"></span>ms
+							<br/><br/>
+						</div>
+						<div>
+							<b>Actions before it: </b><br/>
+							<span id="actionsBefore"></span>
+						</div>
+						<div>
+							<b>Actions after it: </b><br/>
+							<span id="actionsAfter"></span>
+						</div>
+						<div>
+							<b>Return data summary: </b><br/>
+							Input action: <select id="rDataSummaryBefore" style="margin-right: 20px;"></select> 
+							<span style='margin-left: 10px;'>Output action: <select id="rDataSummaryAfter"></select></span><br/><br/>
+							<div id="outputSummary">
+								
+							</div>
+							<br/><br/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div id="gap-move"></div>
+	<div id="gap"></div>
+
+	<div id="atvInfoDiv">
+		<div id="atvInfoAndButtonsDiv">
+			<div id="infoFormatButtonsDiv" style="color:white; padding:5px 0px;">
+				<span class="roundRect toolBarButton" id="renderedView" style="background-color: LightSeaGreen; cursor: pointer; ">Rendered View</span>
+				<span class="roundRect toolBarButton" id="jsonView" style="background-color: lightGrey; cursor: pointer; margin-left: 5px">JSON view</span>
+				<span class="roundRect" id="backToSummary" style="background-color: orange; cursor: pointer; margin-left: 10px; display: none;">Back</span>
+			</div>
+			<div style="height: 20px;"></div>
+			<p id="activationIdDiv">Activation ID: <a id="activationIdLink">52c43f1a185d4b39bda8beb1def1dc3c</a> </p>
+
+			<div id="atvInfo">		
+				
+				
+				<p id="actionName"></p>
+				<span id="actionType" class="roundRect"></span> <span id="codeLink">view code</span><br/><br/>
+				<p>
+					<span id="warningDiv">
+						
+					</span>
+					<b>Start time:</b> <span id="startTime"></span><br/><br/>
+					<span id="endTimeDiv">
+						<!--<b>End time:</b> <span id="endTime"></span><br/><br/>-->
+						<b>Duration:</b> <span id="duration"></span>ms <!--<span id="costSpan">Cost (running <span id="costTimes">5,000,000</span> times): <span id="cost"></span></span>--><br/><br/>
+					</span>
+					<span id="causedByDiv">
+						<b>Caused by:</b> <span id="causedByContent"></span><br/><br/>
+					</span>
+					<span id="inputDiv">
+						<b>Input data:</b> 
+						<span id="prebindedParams"></span>
+						<span id="inputSource"></span><br/><span id="inputData"></span><br/><br/>
+					</span>
+					<span id="invokeDiv">
+						<b>Invoke:</b> <span id="invokeContent"></span><br/><br/>			
+					</span>
+					<span id="outputDiv">
+						<b>Output data:</b> <span id="diffLink">(compare input and output)</span> <br/><span id="outputData"></span><br/><br/>
+					</span>
+					<br/><br/><br/>
+					<span id="devLogsDiv" style="display: none">
+						<b>Developer logs:</b> <br/><br/><span id="devLogData"></span><br/><br/>
+					</span>
+
+				</p>		
+				<p id="jsonDetail" style="display: none">
+					
+
+				</p>
+
+
+			</div>
+
+			<div id="rawJSONAtv" style="display: none">			
+
+			</div>
+		</div>
+
+		<div id="summaryDetailDiv" style="display: none; margin-top: 45px;">	
+
+
+		</div>
+	</div>
+
+	</div>
+
+	<div id="loading">Loading...</div>
+
+</body>	

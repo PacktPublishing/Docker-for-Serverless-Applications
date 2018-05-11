@@ -1,0 +1,9 @@
+FROM node:8-alpine
+
+COPY ./WITT /root/
+WORKDIR /root/WITT
+RUN npm install
+
+EXPOSE 8080
+ENV NODE_TLS_REJECT_UNAUTHORIZED 0
+CMD ["node", "--harmony", "/root/WITT/witt.js"]
