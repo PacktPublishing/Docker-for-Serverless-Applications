@@ -1,0 +1,179 @@
+################################################
+#
+# SuraWhisk: OpenWhisk on Docker Swarm Mode
+#
+################################################
+
+version: '3.3'
+
+services:
+  couchdb:
+    image: klaemo/couchdb:2.0
+#    volumes:
+#      - /
+#    ports:
+#      - 5984:5984
+    environment:
+      - COUCHDB_USER=whisk_admin
+      - NODENAME=couchdb0
+      - COUCHDB_PASSWORD=some_passw0rd
+
+  redis:
+    image: redis:3.2
+
+  apigateway:
+    image: openwhisk/apigateway:0.9.8
+    ports:
+      - 80:80
+#      - 9000:9000
+#      - 8080:8080
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  zookeeper:
+    image: zookeeper:3.4
+    environment:
+      - ZOO_USER=zookeeper
+      - ZOO_CONF_DIR=/conf
+      - ZOO_DATA_DIR=/data
+      - ZOO_DATA_LOG_DIR=/datalog
+      - ZOO_PORT=2181
+      - ZOO_TICK_TIME=2000
+      - ZOO_INIT_LIMIT=5
+      - ZOO_SYNC_LIMIT=2
+      - ZOO_MAX_CLIENT_CNXNS=60
+
+  kafka:
+    image: wurstmeister/kafka:0.11.0.1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ~/tmp/openwhisk/kafka:/kafka:rw
+
+  controller0:
+    image: openwhisk/controller:latest
+    depends_on:
+        - kafka
+        - couchdb
+    command: /bin/sh -c "export CONTAINER_IP=controller0; controller/bin/controller 0"
+    environment:
+        - AKKA_ACTOR_PROVIDER=cluster
+        - AKKA_CLUSTER_BIND_PORT=2551
+        - AKKA_CLUSTER_HOST=controller0
+        - AKKA_CLUSTER_PORT=2551
+        - "AKKA_CLUSTER_SEED_NODES=controller0:2551 controller1:2551"
+        - COMPONENT_NAME=controller0
+        - CONTROLLER_BLACKBOXFRACTION=0.1
+        - CONTROLLER_HA=True
+        - CONTROLLER_LOCALBOOKKEEPING=true
+        - "CONTROLLER_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098"
+        - DB_HOST=couchdb
+        - DB_PASSWORD=some_passw0rd
+        - DB_PORT=5984
+        - DB_PROTOCOL=http
+        - DB_PROVIDER=CouchDB
+        - DB_USERNAME=whisk_admin
+        - DB_WHISK_ACTIONS=whisk_local_whisks
+        - DB_WHISK_ACTIONS_DDOC=whisks.v2
+        - DB_WHISK_ACTIVATIONS=whisk_local_activations
+        - DB_WHISK_ACTIVATIONS_DDOC=whisks.v2
+        - DB_WHISK_ACTIVATIONS_FILTER_DDOC=whisks-filters.v2
+        - DB_WHISK_AUTHS=whisk_local_subjects
+        - KAFKA_HOST=kafka
+        - KAFKA_HOST_PORT=9092
+        - KAFKA_TOPICS_COMPLETED_RETENTION_BYTES=1073741824
+        - KAFKA_TOPICS_COMPLETED_RETENTION_MS=3600000
+        - KAFKA_TOPICS_COMPLETED_SEGMENT_BYTES=536870912
+        - LIMITS_ACTIONS_INVOKES_CONCURRENT=30
+        - LIMITS_ACTIONS_INVOKES_CONCURRENTINSYSTEM=5000
+        - LIMITS_ACTIONS_INVOKES_PERMINUTE=60
+        - LIMITS_ACTIONS_SEQUENCE_MAXLENGTH=50
+        - LIMITS_TRIGGERS_FIRES_PERMINUTE=60
+        - LOADBALANCER_INVOKERBUSYTHRESHOLD=16
+        - METRICS_KAMON=False
+        - METRICS_KAMON_HOST=
+        - METRICS_KAMON_PORT=8125
+        - METRICS_LOG=True
+        - PORT=8080
+        - "RUNTIMES_MANIFEST={\"defaultImagePrefix\": \"openwhisk\", \"defaultImageTag\": \"latest\", \"blackboxes\": [{\"name\": \"dockerskeleton\"}], \"runtimes\": {\"python\": [{\"deprecated\": false, \"kind\": \"python\", \"image\": {\"name\": \"python2action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"python:2\", \"image\": {\"name\": \"python2action\"}}, {\"deprecated\": false, \"kind\": \"python:3\", \"image\": {\"name\": \"python3action\"}}], \"java\": [{\"kind\": \"java\", \"default\": true, \"deprecated\": false, \"image\": {\"name\": \"java8action\"}, \"attached\": {\"attachmentType\": \"application/java-archive\", \"attachmentName\": \"jarfile\"}, \"sentinelledLogs\": false, \"requireMain\": true}], \"php\": [{\"default\": true, \"deprecated\": false, \"kind\": \"php:7.1\", \"image\": {\"name\": \"action-php-v7.1\"}}], \"swift\": [{\"deprecated\": true, \"kind\": \"swift\", \"image\": {\"name\": \"swiftaction\"}}, {\"deprecated\": false, \"kind\": \"swift:3\", \"image\": {\"name\": \"swift3action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"swift:3.1.1\", \"image\": {\"name\": \"action-swift-v3.1.1\"}}], \"nodejs\": [{\"deprecated\": true, \"kind\": \"nodejs\", \"image\": {\"name\": \"nodejsaction\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"nodejs:6\", \"image\": {\"name\": \"nodejs6action\"}}, {\"default\": false, \"deprecated\": false, \"kind\": \"nodejs:8\", \"image\": {\"name\": \"action-nodejs-v8\"}}]}}"
+        - UPDATE=141
+        - VERSION=8
+        - WHISK_VERSION_BUILDNO=latest
+        - WHISK_VERSION_DATE=2017-11-20T18:29:29Z
+        - WHISK_VERSION_NAME=local
+
+  controller1:
+    image: openwhisk/controller:latest
+    depends_on:
+        - kafka
+        - couchdb
+    command: /bin/sh -c "export CONTAINER_IP=controller1; controller/bin/controller 1"
+    environment:
+        - AKKA_ACTOR_PROVIDER=cluster
+        - AKKA_CLUSTER_BIND_PORT=2551
+        - AKKA_CLUSTER_HOST=controller1
+        - AKKA_CLUSTER_PORT=2551
+        - "AKKA_CLUSTER_SEED_NODES=controller0:2551 controller1:2551"
+        - COMPONENT_NAME=controller1
+        - CONTROLLER_BLACKBOXFRACTION=0.1
+        - CONTROLLER_HA=False
+        - CONTROLLER_INSTANCES=2
+        - CONTROLLER_LOCALBOOKKEEPING=true
+        - "CONTROLLER_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098"
+        - DB_HOST=couchdb
+        - DB_PASSWORD=some_passw0rd
+        - DB_PORT=5984
+        - DB_PROTOCOL=http
+        - DB_PROVIDER=CouchDB
+        - DB_USERNAME=whisk_admin
+        - DB_WHISK_ACTIONS=whisk_local_whisks
+        - DB_WHISK_ACTIONS_DDOC=whisks.v2
+        - DB_WHISK_ACTIVATIONS=whisk_local_activations
+        - DB_WHISK_ACTIVATIONS_DDOC=whisks.v2
+        - DB_WHISK_ACTIVATIONS_FILTER_DDOC=whisks-filters.v2
+        - DB_WHISK_AUTHS=whisk_local_subjects
+        - KAFKA_HOST=kafka
+        - KAFKA_HOST_PORT=9092
+        - KAFKA_TOPICS_COMPLETED_RETENTION_BYTES=1073741824
+        - KAFKA_TOPICS_COMPLETED_RETENTION_MS=3600000
+        - KAFKA_TOPICS_COMPLETED_SEGMENT_BYTES=536870912
+        - LIMITS_ACTIONS_INVOKES_CONCURRENT=30
+        - LIMITS_ACTIONS_INVOKES_CONCURRENTINSYSTEM=5000
+        - LIMITS_ACTIONS_INVOKES_PERMINUTE=60
+        - LIMITS_ACTIONS_SEQUENCE_MAXLENGTH=50
+        - LIMITS_TRIGGERS_FIRES_PERMINUTE=60
+        - LOADBALANCER_INVOKERBUSYTHRESHOLD=16
+        - METRICS_KAMON=False
+        - METRICS_KAMON_HOST=
+        - METRICS_KAMON_PORT=8125
+        - METRICS_LOG=True
+        - PORT=8080
+        - "RUNTIMES_MANIFEST={\"defaultImagePrefix\": \"openwhisk\", \"defaultImageTag\": \"latest\", \"blackboxes\": [{\"name\": \"dockerskeleton\"}], \"runtimes\": {\"python\": [{\"deprecated\": false, \"kind\": \"python\", \"image\": {\"name\": \"python2action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"python:2\", \"image\": {\"name\": \"python2action\"}}, {\"deprecated\": false, \"kind\": \"python:3\", \"image\": {\"name\": \"python3action\"}}], \"java\": [{\"kind\": \"java\", \"default\": true, \"deprecated\": false, \"image\": {\"name\": \"java8action\"}, \"attached\": {\"attachmentType\": \"application/java-archive\", \"attachmentName\": \"jarfile\"}, \"sentinelledLogs\": false, \"requireMain\": true}], \"php\": [{\"default\": true, \"deprecated\": false, \"kind\": \"php:7.1\", \"image\": {\"name\": \"action-php-v7.1\"}}], \"swift\": [{\"deprecated\": true, \"kind\": \"swift\", \"image\": {\"name\": \"swiftaction\"}}, {\"deprecated\": false, \"kind\": \"swift:3\", \"image\": {\"name\": \"swift3action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"swift:3.1.1\", \"image\": {\"name\": \"action-swift-v3.1.1\"}}], \"nodejs\": [{\"deprecated\": true, \"kind\": \"nodejs\", \"image\": {\"name\": \"nodejsaction\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"nodejs:6\", \"image\": {\"name\": \"nodejs6action\"}}, {\"default\": false, \"deprecated\": false, \"kind\": \"nodejs:8\", \"image\": {\"name\": \"action-nodejs-v8\"}}]}}"
+        - UPDATE=141
+        - VERSION=8
+        - WHISK_VERSION_BUILDNO=latest
+        - WHISK_VERSION_DATE=2017-11-20T18:29:29Z
+        - WHISK_VERSION_NAME=local
+
+  invoker0:
+    image: openwhisk/invoker
+    privileged: true
+    volumes:
+      - /usr/bin/docker-runc:/usr/bin/docker-runc:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /var/lib/docker/containers:/containers:rw
+      - /run/runc:/run/runc:rw
+      - /home/chanwit/tmp/openwhisk/invoker/logs:/logs:rw
+
+networks:
+  default:
+    external:
+      name: surawhisk_net

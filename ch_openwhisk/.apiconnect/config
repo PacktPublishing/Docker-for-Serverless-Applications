@@ -1,0 +1,5 @@
+UI_Default_Server:
+  host: '192.168.33.13:9000'
+  displayName: OW
+  dedicated: true
+  name: ow

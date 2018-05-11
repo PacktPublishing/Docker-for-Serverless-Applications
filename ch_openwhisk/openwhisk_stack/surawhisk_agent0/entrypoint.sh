@@ -1,0 +1,88 @@
+docker container run \
+  --privileged \
+  --pid=host \
+  --userns=host \
+  --network surawhisk_net \
+  -e "AKKA_ACTOR_PROVIDER=local" \
+  -e "AKKA_CLUSTER_BIND_PORT=5221" \
+  -e "AKKA_CLUSTER_HOST=localhost" \
+  -e "AKKA_CLUSTER_SEED_NODES=[]" \
+  -e "BUILD=15" \
+  -e "COMPONENT_NAME=invoker" \
+  -e "CONFIG_akka_actor_provider=cluster" \
+  -e "CONFIG_kamon_statsd_port=8125" \
+  -e "CONFIG_whisk_loadbalancer_blackboxFraction=0.1" \
+  -e "CONFIG_whisk_loadbalancer_invokerBusyThreshold=16" \
+  -e "CONTROLLER_BLACKBOXFRACTION=0.10" \
+  -e "CONTROLLER_HA=True" \
+  -e "CONTROLLER_LOCALBOOKKEEPING=true" \
+  -e "CONTROLLER_OPTS=-Dcom.sun.management.jmxremote-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098" \
+  -e "DB_HOST=db" \
+  -e "DB_PASSWORD=some_passw0rd" \
+  -e "DB_PORT=5984" \
+  -e "DB_PREFIX=local_" \
+  -e "DB_PROTOCOL=http" \
+  -e "DB_PROVIDER=CouchDB" \
+  -e "DB_USERNAME=whisk_admin" \
+  -e "DB_WHISK_ACTIONS=local_whisks" \
+  -e "DB_WHISK_ACTIONS_DDOC=whisks.v2" \
+  -e "DB_WHISK_ACTIVATIONS=local_activations" \
+  -e "DB_WHISK_ACTIVATIONS_DDOC=whisks.v2" \
+  -e "DB_WHISK_ACTIVATIONS_FILTER_DDOC=whisks-filters.v2" \
+  -e "DB_WHISK_AUTHS=local_subjects" \
+  -e "DOCKER_BINARY=/usr/bin/docker" \
+  -e "DOCKER_COMPOSE_HOST=localhost" \
+  -e "DOCKER_IMAGE_PREFIX=openwhisk" \
+  -e "DOCKER_REGISTRY=" \
+  -e "DOCKER_VERSION=17.09.0" \
+  -e "EDGE_HOST=localhost" \
+  -e "EDGE_HOST_APIPORT=443" \
+  -e "INVOKER_CONTAINER_NETWORK=surawhisk_net" \
+  -e "INVOKER_CORESHARE=2" \
+  -e "INVOKER_NUMCORE=2" \
+  -e "INVOKER_OPTS=-Dcom.sun.management.jmxremote-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098" \
+  -e "INVOKER_USE_RUNC=True" \
+  -e "KAFKA_ADVERTISED_PORT=9092" \
+  -e "KAFKA_BROKER_ID=0" \
+  -e "KAFKA_DEFAULT_REPLICATION_FACTOR=1" \
+  -e "KAFKA_HEAP_OPTS=-Xmx512m -Xms512m" \
+  -e "KAFKA_HOSTS=kafka:9092" \
+  -e "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1" \
+  -e "KAFKA_REPLICATIONFACTOR=1" \
+  -e "KAFKA_TOPICS_COMPLETED_RETENTION_BYTES=104857600" \
+  -e "KAFKA_TOPICS_COMPLETED_RETENTION_MS=300000" \
+  -e "KAFKA_TOPICS_COMPLETED_SEGMENT_BYTES=536870912" \
+  -e "LIMITS_ACTIONS_INVOKES_CONCURRENT=5000" \
+  -e "LIMITS_ACTIONS_INVOKES_CONCURRENTINSYSTEM=5000" \
+  -e "LIMITS_ACTIONS_INVOKES_PERMINUTE=60000" \
+  -e "LIMITS_ACTIONS_SEQUENCE_MAXLENGTH=20" \
+  -e "LIMITS_TRIGGERS_FIRES_PERMINUTE=60000" \
+  -e "LOADBALANCER_ACTIVATIONCOUNTBEFORENEXTINVOKER=10" \
+  -e "LOADBALANCER_INVOKERBUSYTHRESHOLD=16" \
+  -e "METRICS_KAMON=False" \
+  -e "METRICS_KAMON_PORT=8125" \
+  -e "METRICS_LOG=True" \
+	-e "PORT=8085" \
+	-e "RUNC_BINARY=/usr/bin/docker-runc" \
+  -e "RUNTIMES_MANIFEST={\"defaultImagePrefix\": \"openwhisk\",\"defaultImageTag\": \"latest\", \"blackboxes\": [{\"name\": \"dockerskeleton\"}], \"runtimes\": {\"python\": [{\"deprecated\": false, \"kind\": \"python\", \"image\": {\"name\": \"python2action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"python:2\", \"image\": {\"name\": \"python2action\"}}, {\"deprecated\": false, \"kind\": \"python:3\", \"image\": {\"name\": \"python3action\"}}], \"java\": [{\"kind\": \"java\", \"default\": true, \"deprecated\": false, \"image\": {\"name\": \"java8action\"}, \"attached\": {\"attachmentType\": \"application/java-archive\", \"attachmentName\": \"jarfile\"}, \"sentinelledLogs\": false, \"requireMain\": true}], \"php\": [{\"default\": true, \"deprecated\": false, \"kind\": \"php:7.1\", \"image\": {\"name\": \"action-php-v7.1\"}}], \"swift\": [{\"deprecated\": true, \"kind\": \"swift\", \"image\": {\"name\": \"swiftaction\"}}, {\"deprecated\": true, \"kind\": \"swift:3\", \"image\": {\"name\": \"swift3action\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"swift:3.1.1\", \"image\": {\"name\": \"action-swift-v3.1.1\"}}], \"nodejs\": [{\"deprecated\": true, \"kind\": \"nodejs\", \"image\": {\"name\": \"nodejsaction\"}}, {\"default\": true, \"deprecated\": false, \"kind\": \"nodejs:6\", \"image\": {\"name\": \"nodejs6action\"}}, {\"default\": false, \"deprecated\": false, \"kind\": \"nodejs:8\", \"image\": {\"name\": \"action-nodejs-v8\"}}]}}" \
+  -e "SERVICE_CHECK_HTTP=/ping" \
+  -e "SERVICE_CHECK_INTERVAL=15s" \
+  -e "SERVICE_CHECK_TIMEOUT=2s" \
+  -e "SERVICE_NAME=invoker0" \
+  -e "SIG=336fa29ff2bb4ef291e347e091f7f4a7" \
+  -e "UPDATE=141" \
+  -e "VERSION=8" \
+  -e "WHISK_API_HOST_NAME=localhost" \
+  -e "WHISK_LOGS_DIR=/logs" \
+  -e "WHISK_SYSTEM_KEY=whisk.system" \
+  -e "WHISK_VERSION_BUILDNO=latest" \
+  -e "WHISK_VERSION_DATE=09/01/2016" \
+  -e "WHISK_VERSION_NAME=local" \
+  -e "ZOOKEEPER_HOSTS=zookeeper:2181" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/containers:/containers \
+  -v /usr/bin/docker-runc:/usr/bin/docker-runc \
+  -v /run/runc:/run/runc \
+  -v /sys/fs/cgroup:/sys/fs/cgroup \
+  openwhisk/invoker \
+  /invoker/bin/invoker 0
